@@ -1,24 +1,35 @@
-<mat-toolbar color="primary">FinOnis GPT Chat</mat-toolbar>
+<mat-toolbar color="primary" class="chat-header">LSI FinGenie</mat-toolbar>
 
-<div class="chat-box">
-  <mat-card class="chat-card" *ngFor="let chat of chatHistory">
-    <div [ngClass]="chat.sender === 'user' ? 'user-message' : 'ai-message'">
-      <strong>{{ chat.sender === 'user' ? 'You' : 'FinOnis' }}:</strong>
-      <p [innerHTML]="chat.message"></p>
-    </div>
-  </mat-card>
+<div class="chat-container">
+  <!-- Chat Messages -->
+  <div class="chat-box">
+    <mat-card class="chat-card" *ngFor="let chat of chatHistory">
+      <div [ngClass]="chat.sender === 'user' ? 'user-message' : 'ai-message'">
+        <p [innerHTML]="chat.message"></p>
+      </div>
+    </mat-card>
 
-  <mat-card *ngIf="isLoading">
-    <div class="ai-message">
-      <strong>FinOnis:</strong>
-      <p [innerHTML]="formattedResponse"></p>
-      <mat-progress-bar *ngIf="isLoading" mode="indeterminate" color="accent"></mat-progress-bar>
-    </div>
-  </mat-card>
+    <!-- AI Loading -->
+    <mat-card *ngIf="isLoading">
+      <div class="ai-message">
+        <p [innerHTML]="formattedResponse"></p>
+        <mat-progress-bar mode="indeterminate" color="accent"></mat-progress-bar>
+      </div>
+    </mat-card>
+  </div>
 
-  <mat-form-field class="input-area" appearance="outline">
-    <input matInput placeholder="Ask FinOnis..." [(ngModel)]="prompt" />
-  </mat-form-field>
-
-  <button mat-raised-button color="primary" (click)="sendPrompt()">Send</button>
+  <!-- Sticky Input Area -->
+  <div class="input-container">
+    <mat-form-field class="input-area" appearance="outline">
+      <textarea
+        matInput
+        placeholder="Message LSI FinGenie..."
+        [(ngModel)]="prompt"
+        rows="2" (keyup.enter)="sendPrompt()"
+      ></textarea>
+      <button mat-icon-button matSuffix color="primary" (click)="sendPrompt()">
+        <mat-icon>send</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
 </div>

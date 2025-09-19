@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Output } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ChangeDetectorRef } from '@angular/core';
+import { ChatService } from 'src/app/services/chatService.service';
 
 @Component({
   selector: 'app-gpt',
@@ -27,13 +28,12 @@ export class StarterComponent {
   // Inside your GptComponent
   formattedResponse: SafeHtml = '';
 
-  // constructor(private chatService: ChatService, private profileService: ProfileService, private sanitizer: DomSanitizer, private cdRef: ChangeDetectorRef) { }
-constructor() { }
-  // private formatResponse(text: string): SafeHtml {
-  //   const withLineBreaks = text.replace(/\n/g, '<br>');
-  //   const withBold = withLineBreaks.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-  //   return this.sanitizer.bypassSecurityTrustHtml(withBold);
-  // }
+  constructor(private chatService: ChatService, private sanitizer: DomSanitizer, private cdRef: ChangeDetectorRef) { }
+  private formatResponse(text: string): SafeHtml {
+    const withLineBreaks = text.replace(/\n/g, '<br>');
+    const withBold = withLineBreaks.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+    return this.sanitizer.bypassSecurityTrustHtml(withBold);
+  }
 
   sendPrompt() {
     if (!this.prompt.trim()) return;
@@ -50,29 +50,29 @@ constructor() { }
     //   next: (profile) => {
     //     this.userId = profile.id;
 
-    //     this.chatService.streamChat(this.userId, currentPrompt).subscribe({
-    //       next: (chunk: any) => {
-    //         try {
-    //           const data = JSON.parse(chunk);
-    //           this.currentResponse += data.response;
-    //           this.formattedResponse = this.formatResponse(this.currentResponse);
-    //           this.cdRef.detectChanges(); // 🔁 Update UI with streamed response
-    //         } catch (e) {
-    //           console.error('Invalid chunk:', chunk);
-    //         }
-    //       },
-    //       complete: () => {
-    //         this.isLoading = false;
-    //         this.chatHistory.push({ sender: 'ai', message: this.formattedResponse });
-    //         this.chatSaved.emit({ prompt: currentPrompt, response: this.currentResponse });
-    //         this.cdRef.detectChanges(); // 🔁 Final update
-    //       },
-    //       error: (err) => {
-    //         this.isLoading = false;
-    //         console.error('Streaming error:', err);
-    //       }
-    //     });
-    //   },
+        this.chatService.streamChat(this.userId, currentPrompt).subscribe({
+          next: (chunk: any) => {
+            try {
+              const data = JSON.parse(chunk);
+              this.currentResponse += data.response;
+              this.formattedResponse = this.formatResponse(this.currentResponse);
+              this.cdRef.detectChanges(); // 🔁 Update UI with streamed response
+            } catch (e) {
+              console.error('Invalid chunk:', chunk);
+            }
+          },
+          complete: () => {
+            this.isLoading = false;
+            this.chatHistory.push({ sender: 'ai', message: this.formattedResponse });
+            this.chatSaved.emit({ prompt: currentPrompt, response: this.currentResponse });
+            this.cdRef.detectChanges(); // 🔁 Final update
+          },
+          error: (err) => {
+            this.isLoading = false;
+            console.error('Streaming error:', err);
+          }
+        });
+      // },
     //   error: (error) => {
     //     this.isLoading = false;
     //     console.error('Error fetching profile info:', error);
