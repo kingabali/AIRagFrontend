@@ -1,111 +1,104 @@
-import { BreakpointObserver, MediaMatcher } from '@angular/cdk/layout';
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  HostListener,
+  OnDestroy,
+  inject,
+} from '@angular/core';
+import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { Subscription } from 'rxjs';
-import { MatSidenav, MatSidenavContent } from '@angular/material/sidenav';
+import { MatSidenav } from '@angular/material/sidenav';
 import { CoreService } from 'src/app/services/core.service';
-
+import { NavService } from 'src/app/services/nav.service';
+import { AppSettings } from 'src/app/app.config';
 import { filter } from 'rxjs/operators';
-import { NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { NavItem } from './sidebar/nav-item/nav-item';
 import { RouterModule } from '@angular/router';
-import { MaterialModule } from 'src/app/material.module';
 import { CommonModule } from '@angular/common';
+import { SidebarComponent } from './sidebar/sidebar.component';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { TablerIconsModule } from 'angular-tabler-icons';
+import { MaterialModule } from 'src/app/material.module';
 import { HeaderComponent } from './header/header.component';
-import { SidebarComponent } from './sidebar/sidebar.component';
-import { AppNavItemComponent } from './sidebar/nav-item/nav-item.component';
-import { navItems } from './sidebar/sidebar-data';
 
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
-
+const MONITOR_VIEW = 'screen and (min-width: 1024px)';
 
 @Component({
   selector: 'app-full',
-  imports: [
-    RouterModule,
-    AppNavItemComponent,
-    MaterialModule,
-    CommonModule,
-    SidebarComponent,
-    NgScrollbarModule,
-    TablerIconsModule,
-    HeaderComponent
-  ],
   templateUrl: './full.component.html',
   styleUrls: [],
-  encapsulation: ViewEncapsulation.None,
+  standalone: true,
+  imports: [
+    RouterModule,
+    CommonModule,
+    SidebarComponent,
+    HeaderComponent,
+    NgScrollbarModule,
+    TablerIconsModule,
+    MaterialModule,
+  ],
 })
-export class FullComponent implements OnInit {
-  navItems = navItems;
+export class FullComponent implements OnInit, OnDestroy {
+  navItems = new NavItem().getMenu();
 
   @ViewChild('leftsidenav')
   public sidenav: MatSidenav;
-  resView = false;
-
-  @ViewChild('content', { static: true }) content!: MatSidenavContent;
   //get options from service
-  options = this.settings.getOptions();
   private layoutChangesSubscription = Subscription.EMPTY;
   private isMobileScreen = false;
   private isContentWidthFixed = true;
-  private isCollapsedWidthFixed = false;
-  private htmlElement!: HTMLHtmlElement;
+  private isMobileScreenSubscription: Subscription;
+
+  options = this.settings.getOptions();
+  private router = inject(Router);
+  private settings = inject(CoreService);
+  private breakpointObserver = inject(BreakpointObserver);
+  private activatedRoute = inject(ActivatedRoute);
 
   get isOver(): boolean {
     return this.isMobileScreen;
   }
 
+  get isDark(): boolean {
+    return this.options.theme === 'dark';
+  }
+
   constructor(
-    private settings: CoreService,
-    private router: Router,
-    private breakpointObserver: BreakpointObserver,
-  ) {
-    this.htmlElement = document.querySelector('html')!;
-    this.layoutChangesSubscription = this.breakpointObserver
-      .observe([MOBILE_VIEW, TABLET_VIEW])
-      .subscribe((state) => {
-        // SidenavOpened must be reset true when layout changes
-        this.options.sidenavOpened = true;
-        this.isMobileScreen = state.breakpoints[MOBILE_VIEW];
-        if (this.options.sidenavCollapsed == false) {
-          this.options.sidenavCollapsed = state.breakpoints[TABLET_VIEW];
-        }
-      });
+    private navService: NavService,
+    public CoreService: CoreService
+  ) {}
 
-    // Initialize project theme with options
-
-
-    // This is for scroll to top
-    this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe((e) => {
-        this.content.scrollTo({ top: 0 });
-      });
+  ngOnInit(): void {
+    this.initBreakpointObserver();
   }
 
-  ngOnInit(): void {}
-
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.layoutChangesSubscription.unsubscribe();
+    this.isMobileScreenSubscription.unsubscribe();
   }
 
-  toggleCollapsed() {
-    this.isContentWidthFixed = false;
-    this.options.sidenavCollapsed = !this.options.sidenavCollapsed;
-    this.resetCollapsedState();
+  toggleTheme() {
+    this.options.theme = this.options.theme === 'dark' ? 'light' : 'dark';
   }
 
-  resetCollapsedState(timer = 400) {
-    setTimeout(() => this.settings.setOptions(this.options), timer);
-  }
-
-  onSidenavClosedStart() {
-    this.isContentWidthFixed = false;
+  private initBreakpointObserver(): void {
+    this.isMobileScreenSubscription = this.breakpointObserver
+      .observe([MOBILE_VIEW, TABLET_VIEW, MONITOR_VIEW])
+      .subscribe((state: BreakpointState) => {
+        this.isMobileScreen = state.breakpoints[MOBILE_VIEW];
+        this.options.sidenavOpened = !this.isMobileScreen;
+      });
   }
 
   onSidenavOpenedChange(isOpened: boolean) {
-    this.isCollapsedWidthFixed = !this.isOver;
     this.options.sidenavOpened = isOpened;
+  }
+
+  onSidenavClosedStart() {
+    // throw new Error('Method not implemented.');
   }
 }

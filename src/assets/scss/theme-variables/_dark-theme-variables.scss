@@ -1,0 +1,24 @@
+html .dark-theme {
+  color-scheme: dark;
+  --mat-sys-background: #20232a;
+  --mat-sys-surface-bright: #2a2d35;
+  --matsys-surface-tint: #4889e8;
+  --mat-sys-surface: #2a2d35;
+  --mat-sys-surface-container: #2a2d35;
+  --mat-sys-surface-container-low: #3a3d45;
+  --mat-sys-surface-container-lowest: #1a1d25;
+  --mat-sys-on-background: #f2f6fa;
+  --mat-sys-outline: #4a4d55;
+  --mat-sys-outline-variant: #4a4d55;
+  --mdc-outlined-text-field-hover-outline-color: #4a4d55;
+  --mdc-checkbox-unselected-hover-state-layer-color: #4a4d55;
+  --mat-menu-item-hover-state-layer-color: #3a3d45;
+  --mat-standard-button-toggle-state-layer-color: #3a3d45;
+  --mat-option-focus-state-layer-color: #3a3d45;
+  --mat-option-hover-state-layer-color: #3a3d45;
+  --mdc-switch-unselected-track-color: #3a3d45;
+  --mat-stepper-header-focus-state-layer-color: #3a3d45;
+  --mat-stepper-header-hover-state-layer-color: #3a3d45;
+  --mdc-dialog-supporting-text-color: var(--mat-sys-on-background);
+  --mat-expansion-header-hover-state-layer-color: #3a3d45;
+}

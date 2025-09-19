@@ -20,7 +20,9 @@
 
   <span class="flex-1-auto"></span>
 
-  <a href="https://adminmart.com/product/matdash-material-angular-dashboard-template/?ref=56#product-demo-section" target="_blank" mat-flat-button>Check Pro Template</a>
+  <button mat-icon-button (click)="toggle()">
+    <i class="iconify icon-20 d-flex" [attr.data-icon]="isDark ? 'solar:sun-line-duotone' : 'solar:moon-line-duotone'"></i>
+  </button>
 
   <!-- --------------------------------------------------------------- -->
   <!-- profile Dropdown -->
