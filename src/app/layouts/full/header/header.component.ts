@@ -1,31 +1,32 @@
-import { Component, Output, EventEmitter, Input, OnInit, inject } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { CoreService } from 'src/app/services/core.service';
+import {
+  Component,
+  Output,
+  EventEmitter,
+  Input,
+  ViewEncapsulation,
+} from '@angular/core';
+import { TablerIconsModule } from 'angular-tabler-icons';
+import { MaterialModule } from 'src/app/material.module';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { NgScrollbarModule } from 'ngx-scrollbar';
+import { MatBadgeModule } from '@angular/material/badge';
 
 @Component({
   selector: 'app-header',
+  imports: [
+    RouterModule,
+    CommonModule,
+    NgScrollbarModule,
+    TablerIconsModule,
+    MaterialModule,
+    MatBadgeModule
+  ],
   templateUrl: './header.component.html',
-  styleUrls: [],
+  encapsulation: ViewEncapsulation.None,
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
   @Input() showToggle = true;
   @Input() toggleChecked = false;
   @Output() toggleMobileNav = new EventEmitter<void>();
-  @Output() toggleMobileFilterNav = new EventEmitter<void>();
-  @Output() toggleCollapsed = new EventEmitter<void>();
-  @Output() toggleTheme = new EventEmitter<void>();
-
-  private settings = inject(CoreService);
-
-  constructor(public dialog: MatDialog) {}
-
-  ngOnInit(): void {}
-
-  get isDark() {
-    return this.settings.getOptions().theme === 'dark';
-  }
-
-  toggle() {
-    this.toggleTheme.emit();
-  }
 }
